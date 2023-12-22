@@ -9,10 +9,22 @@
 <!-- css -->
 <style>
   /* default */
+  * {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: pink;
+  }
+  body {
+    background: darkslategray;
+  }
 
   /* main */
 
   /* admin */
+  #admin-blogs-edit {
+    display: none;
+  }
 
   /* views */
 
@@ -21,7 +33,17 @@
 <body>
 
   <!-- html -->
+  <p id="views"></p>
 
+  <div id="admin-blogs-edit">
+    <form action="javascript:;" onsubmit="adminAddBlog(this, this.title.value, this.description.value)">
+      <input type="text" name="title" placeholder="Blog title">
+      <input type="text" name="description" placeholder="Blog description">
+      <input type="submit" value="Add blog">
+    </form>
+  </div>
+
+  <input type="password" name="admin-password" id="admin-password-input">
 
 </body>
 </html>
@@ -32,13 +54,13 @@
   import { getDatabase, ref, set, get, update, DataSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey: 1,
-    authDomain: 2,
-    databaseURL: 3,
-    projectId: 4,
-    storageBucket: 5,
-    messagingSenderId: 6,
-    appId: 7
+    apiKey: "AIzaSyB5qDPAnh5KWKkdbnBnhAAs3bgECeq-vig",
+    authDomain: "test-project-for-examples.firebaseapp.com",
+    databaseURL: "https://test-project-for-examples-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "test-project-for-examples",
+    storageBucket: "test-project-for-examples.appspot.com",
+    messagingSenderId: "840985306092",
+    appId: "1:840985306092:web:390902287ea9721a27d6c9"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -55,9 +77,35 @@
   }
 
   // admin
+  var ifAdmin = false;
+  const adminBlogsEdit = document.getElementById("admin-blogs-edit");
+  const adminPasswordInput = document.getElementById("admin-password-input");
+
+  adminPasswordInput.oninput = () => {
+    let password = adminPasswordInput.value;
+    if (password.length > 8) {
+      adminPasswordInput.value = password.slice(0, 8);
+    }
+    if (password === "admin") {
+      ifAdmin = true;
+      showAdminBlogsEdit();
+    }
+  }
+
+  function showAdminBlogsEdit() {
+    adminBlogsEdit.style.display = "flex";
+    adminPasswordInput.style.display = "none";
+  }
 
   // views
   async function onLoadViews() {
+    let snap = await get(ref(db, "views"));
+    if (!snap.exists()) {
+      set(ref(db), {views: 1});
+      return;
+    }
+    update(ref(db), {views: snap.val() + 1});
+    document.getElementById("views").innerText = snap.val() + 1;
     console.log("Views Loaded");
   }
 
