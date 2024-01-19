@@ -234,7 +234,46 @@
 
   // main
   async function onLoadMain() {
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    const blogsContainer = document.getElementById("blogs-container");
+    let snap = await get(ref(db, "blogs"));
+    if (!snap.exists()) {
+      blogsContainer.innerHTML = "<p>No blogs</p>";
+      return;
+    }
+
+    const blogs = [];
+    snap.forEach(blogSnap => {
+      const blog = blogSnap.val();
+      blog.key = blogSnap.key;
+      blogs.push(blog);
+    });
+    blogs.sort((a, b) => {
+      return b.date - a.date;
+    });
+
+    document.getElementById("total-blogs").innerHTML = `Total blogs: ${blogs.length}`
+
+    const blogsHTML = blogs.map(blog => {
+      let date = (new Date(blog.date)).toLocaleDateString();
+      if (blog.description != null) {
+        return `
+          <div class="blog" onclick="viewBlog('${blog.title.toLowerCase()}')">
+            <h2>${blog.title}</h2>
+            <p>${blog.description}</p>
+            <p>${date}</p>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="blog" onclick="viewBlog('${blog.title.toLowerCase()}')">
+            <h2>${blog.title}</h2>
+            <p>${date}</p>
+          </div>
+        `;
+      }
+    }).join('');
+
+    blogsContainer.innerHTML = blogsHTML;
     console.log("Main Loaded");
   }
 
