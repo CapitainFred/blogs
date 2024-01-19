@@ -1,11 +1,14 @@
+<!-- Объяснение: Это декларация типа документа, которая указывает, что документ соответствует стандарту HTML5 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Объяснение: Это мета-теги, которые определяют кодировку, масштабирование и заголовок документа -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My blogs</title>
 </head>
 
+<!-- Объяснение: Это тег style, который содержит внутренний стиль CSS для оформления элементов документа -->
 <!-- css -->
 <style>
   /* default */
@@ -185,13 +188,17 @@
 <body>
 
   <!-- html -->
+  <!-- Объяснение: Это тег header, который содержит заголовок и подзаголовок вашего сайта блогов -->
   <header class="header">
     <h1 id="blog-name">My blogs</h1>
     <p>by <a href="https://ma.cyou">Mapagmataas</a></p>
   </header>
+  <!-- Объяснение: Это тег p, который содержит общее количество просмотров вашего сайта -->
   <p id="views" title="Total Views"></p>
 
+  <!-- Объяснение: Это тег div, который содержит панель добавления блогов для администратора -->
   <div id="admin-blogs-edit">
+    <!-- Объяснение: Это тег form, который содержит форму для ввода заголовка, описания и кнопки отправки нового блога -->
     <form action="javascript:;" onsubmit="adminAddBlog(this, this.title.value, this.description.value)">
       <input type="text" name="title" placeholder="Blog title">
       <input type="text" name="description" placeholder="Blog description">
@@ -199,21 +206,23 @@
     </form>
   </div>
 
+  <!-- Объяснение: Это тег p, который содержит общее количество блогов на вашем сайте -->
   <p id="total-blogs"></p>
+  <!-- Объяснение: Это тег div, который содержит контейнер для отображения ваших блогов -->
   <div id="blogs-container">
     <p>Loading . . .</p>
   </div>
 
+  <!-- Объяснение: Это тег input, который содержит поле для ввода пароля администратора -->
   <input type="password" name="admin-password" id="admin-pass-input">
-
-</body>
-</html>
 
 <!-- js -->
 <script type="module">
+  // Объяснение: Это импорт модулей Firebase, которые нужны для работы с базой данных
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
   import { getDatabase, ref, set, get, update, DataSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
+  // Объяснение: Это конфигурация Firebase, которая содержит ключи и параметры для подключения к вашей базе данных
   const firebaseConfig = {
     apiKey: "AIzaSyB5qDPAnh5KWKkdbnBnhAAs3bgECeq-vig",
     authDomain: "test-project-for-examples.firebaseapp.com",
@@ -224,38 +233,57 @@
     appId: "1:840985306092:web:390902287ea9721a27d6c9"
   };
 
+  // Объяснение: Это инициализация приложения Firebase с помощью конфигурации
   const app = initializeApp(firebaseConfig);
+  // Объяснение: Это получение ссылки на базу данных Firebase
   export const db = getDatabase(app);
 
+  // Объяснение: Это функция, которая вызывается при загрузке страницы и запускает две другие функции: onLoadMain и onLoadViews
   window.onload = async () => {
     onLoadMain();
     onLoadViews();
   }
 
   // main
+  // Объяснение: Это асинхронная функция, которая загружает и отображает ваши блоги из базы данных Firebase
   async function onLoadMain() {
+    // Объяснение: Это получение ссылки на элемент HTML с id="blogs-container"
     const blogsContainer = document.getElementById("blogs-container");
+    // Объяснение: Это получение снимка данных из базы данных Firebase по пути "blogs"
     let snap = await get(ref(db, "blogs"));
+    // Объяснение: Это проверка, существуют ли данные по этому пути
     if (!snap.exists()) {
+      // Объяснение: Если данных нет, то в элементе HTML отображается сообщение "No blogs"
       blogsContainer.innerHTML = "<p>No blogs</p>";
       return;
     }
 
+    // Объяснение: Это создание пустого массива для хранения блогов
     const blogs = [];
+    // Объяснение: Это перебор всех дочерних элементов снимка данных, которые представляют отдельные блоги
     snap.forEach(blogSnap => {
+      // Объяснение: Это получение значения дочернего элемента, которое содержит информацию о блоге
       const blog = blogSnap.val();
+      // Объяснение: Это добавление свойства key к объекту blog, которое содержит уникальный ключ дочернего элемента
       blog.key = blogSnap.key;
+      // Объяснение: Это добавление объекта blog в массив blogs
       blogs.push(blog);
     });
+    // Объяснение: Это сортировка массива blogs по убыванию даты создания блога
     blogs.sort((a, b) => {
       return b.date - a.date;
     });
 
+    // Объяснение: Это отображение общего количества блогов в элементе HTML с id="total-blogs"
     document.getElementById("total-blogs").innerHTML = `Total blogs: ${blogs.length}`
 
+    // Объяснение: Это преобразование массива blogs в строку HTML, которая содержит разметку для каждого блога
     const blogsHTML = blogs.map(blog => {
+      // Объяснение: Это получение даты создания блога в локальном формате
       let date = (new Date(blog.date)).toLocaleDateString();
+      // Объяснение: Это проверка, есть ли у блога свойство description, которое содержит краткое описание блога
       if (blog.description != null) {
+        // Объяснение: Если есть, то возвращается строка HTML, которая содержит заголовок, описание и дату блога
         return `
           <div class="blog" onclick="viewBlog('${blog.title.toLowerCase()}')">
             <h2>${blog.title}</h2>
@@ -264,6 +292,7 @@
           </div>
         `;
       } else {
+        // Объяснение: Если нет, то возвращается строка HTML, которая содержит только заголовок и дату блога
         return `
           <div class="blog" onclick="viewBlog('${blog.title.toLowerCase()}')">
             <h2>${blog.title}</h2>
@@ -273,78 +302,111 @@
       }
     }).join('');
 
+    // Объяснение: Это замена содержимого элемента HTML с id="blogs-container" на строку HTML с блогами
     blogsContainer.innerHTML = blogsHTML;
+    // Объяснение: Это вывод сообщения в консоль браузера, что функция onLoadMain завершила свою работу
     console.log("Main Loaded");
   }
 
+  // Объяснение: Это часть кода, которая отвечает за функциональность администратора сайта блогов
   // admin
+  // Объяснение: Это переменная, которая хранит значение true или false в зависимости от того, является ли пользователь администратором
   var ifAdmin = false;
+  // Объяснение: Это получение ссылки на элемент HTML с id="admin-blogs-edit", который содержит панель добавления блогов для администратора
   const adminBlogsEdit = document.getElementById("admin-blogs-edit");
+  // Объяснение: Это получение ссылки на элемент HTML с id="admin-pass-input", который содержит поле для ввода пароля администратора
   const adminPassInput = document.getElementById("admin-pass-input");
 
+  // Объяснение: Это функция, которая вызывается при вводе данных в поле для ввода пароля администратора
   adminPassInput.oninput = () => {
+    // Объяснение: Это получение значения, введенного в поле для ввода пароля
     let password = adminPassInput.value;
+    // Объяснение: Это проверка, не превышает ли длина пароля 8 символов
     if (password.length > 8) {
+      // Объяснение: Если превышает, то обрезается лишняя часть пароля
       adminPassInput.value = password.slice(0, 8);
     }
+    // Объяснение: Это проверка, совпадает ли введенный пароль с заданным паролем "admin"
     if (password === "admin") {
+      // Объяснение: Если совпадает, то переменная ifAdmin устанавливается в true, и вызывается функция showAdmin
       ifAdmin = true;
       showAdmin();
     }
   }
 
+  // Объяснение: Это функция, которая отображает панель добавления блогов для администратора
   function showAdmin() {
+    // Объяснение: Это скрытие поля для ввода пароля администратора
     adminPassInput.style.display = "none";
+    // Объяснение: Это отображение панели добавления блогов для администратора
     adminBlogsEdit.style.display = "flex";
   }
 
+  // Объяснение: Это функция, которая добавляет новый блог в базу данных Firebase, принимая в качестве параметров форму, заголовок и описание блога
   window.adminAddBlog = async (thisForm, title, description) => {
+    // Объяснение: Это проверка, является ли пользователь администратором
     if (!ifAdmin) {
+      // Объяснение: Если нет, то выводится сообщение об ошибке и функция завершается
       alert("You are not an admin!");
       return;
     }
+    // Объяснение: Это проверка, не содержит ли заголовок блога недопустимых символов, таких как ".", "#", "$", "[", "]"
     if (/[.#$\[\]]/.test(title)) {
+      // Объяснение: Если содержит, то выводится сообщение об ошибке и функция завершается
       alert('Title can not contain any of the folowing characters:\n".", "#", "$", "[", "]"');
       return;
     }
+    // Объяснение: Это проверка, не слишком ли короткий заголовок блога
     if (title.length < 3) {
+      // Объяснение: Если слишком короткий, то выводится сообщение об ошибке и функция завершается
       alert("Title is too short,\nminimum lenght is 3 characters");
       return;
     }
+    // Объяснение: Это проверка, не слишком ли длинный заголовок блога
     if (title.length > 32) {
+      // Объяснение: Если слишком длинный, то выводится сообщение об ошибке и функция завершается
       alert("Title is too long,\nmaximum lenght is 32 characters");
       return;
     }
+    // Объяснение: Это проверка, не слишком ли длинное описание блога
     if (description.length > 64) {
+      // Объяснение: Если слишком длинное, то выводится сообщение об ошибке и функция завершается
       alert("Description is too long,\nmaximum lenght is 64 characters");
       return;
     }
+    // Объяснение: Это получение снимка данных из базы данных Firebase по пути "blogs" с добавлением заголовка блога в нижнем регистре
     let snap = await get(ref(db, "blogs/" + title.toLowerCase()));
+    // Объяснение: Это проверка, существует ли уже блог с таким же заголовком
     if (snap.exists()) {
+      // Объяснение: Если существует, то выводится сообщение об ошибке и функция завершается
       alert("Blog with this title already exists!");
       return;
     }
+    // Объяснение: Это создание объекта blogData, который содержит заголовок и дату создания блога
     const blogData = {
       title: title,
       date: Date.now()
     };
+    // Объяснение: Это проверка, есть ли у блога свойство description, которое содержит краткое описание блога
     if (description.length > 0) {
-      if (description.length < 6) {
-        alert("Description is too short,\nminimum lenght is 6 characters");
-        return;
-      }
+      // Объяснение: Если есть, то добавляется свойство description к объекту blogData
       blogData.description = description;
     }
+    // Объяснение: Это установка значения объекта blogData в базу данных Firebase по пути "blogs" с добавлением заголовка блога в нижнем регистре
     await set(ref(db, "blogs/" + title.toLowerCase()), blogData);
+    // Объяснение: Это изменение цвета фона кнопки отправки на зеленый, чтобы показать, что блог успешно добавлен
     thisForm.querySelector("input[type='submit']").style.background = "#55dbaf";
+    // Объяснение: Это очистка значений полей для ввода заголовка и описания блога
     thisForm.querySelectorAll("input[type='text']").forEach((thisInput) => {
       thisInput.value = "";
     });
+    // Объяснение: Это установка таймера на одну секунду, после которого цвет фона кнопки отправки возвращается к исходному
     setTimeout(() => {
       thisForm.querySelector("input[type='submit']").style.background = "#49aebb";
     }, 1000);
   }
 
+  // // Объяснение: Это тестировочное добавление 1000 блогов
   // for (let i = 0; i < 1000; i++) {
   //   admin = true
   //   let title = "Blog " + (Math.random() * 1000000000).toFixed(0);
@@ -353,17 +415,23 @@
   // }
 
   // views
+  // Объяснение: Это асинхронная функция, которая загружает и отображает общее количество просмотров вашего сайта из базы данных Firebase
   async function onLoadViews() {
+    // Объяснение: Это получение снимка данных из базы данных Firebase по пути "views"
     let snap = await get(ref(db, "views"));
+    // Объяснение: Это проверка, существуют ли данные по этому пути
     if (!snap.exists()) {
+      // Объяснение: Если данных нет, то устанавливается значение 1 по этому пути
       set(ref(db), {views: 1});
     } else {
+      // Объяснение: Если данные есть, то увеличивается значение на 1 по этому пути
       update(ref(db), {views: snap.val() + 1});
     }
+    // Объяснение: Это отображение значения просмотров в элементе HTML с id="views"
     document.getElementById("views").innerText = snap.val() + 1;
+    // Объяснение: Это вывод сообщения в консоль браузера, что функция onLoadViews завершила свою работу
     console.log("Views Loaded");
   }
-
 </script>
 
 </body>

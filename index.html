@@ -206,9 +206,6 @@
 
   <input type="password" name="admin-password" id="admin-pass-input">
 
-</body>
-</html>
-
 <!-- js -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
@@ -329,10 +326,6 @@
       date: Date.now()
     };
     if (description.length > 0) {
-      if (description.length < 6) {
-        alert("Description is too short,\nminimum lenght is 6 characters");
-        return;
-      }
       blogData.description = description;
     }
     await set(ref(db, "blogs/" + title.toLowerCase()), blogData);
@@ -363,7 +356,6 @@
     document.getElementById("views").innerText = snap.val() + 1;
     console.log("Views Loaded");
   }
-
 </script>
 
 </body>
