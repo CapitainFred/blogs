@@ -329,7 +329,7 @@
       date: Date.now()
     };
     if (description.length > 0) {
-      if (description.lehgth < 6) {
+      if (description.length < 6) {
         alert("Description is too short,\nminimum lenght is 6 characters");
         return;
       }
@@ -341,7 +341,7 @@
       thisInput.value = "";
     });
     setTimeout(() => {
-      thisForm.querySelector("input[type='submit']").style.background = "49aebb";
+      thisForm.querySelector("input[type='submit']").style.background = "#49aebb";
     }, 1000);
   }
 
