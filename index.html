@@ -9,31 +9,187 @@
 <!-- css -->
 <style>
   /* default */
+  body {
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    overflow-x: hidden;
+    background: linear-gradient(180deg, #55cbdb 55%, #49aebb 100%);
+  }
   * {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: pink;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    color: white;
   }
-  body {
-    background: darkslategray;
+  .header {
+    width: 100vw;
+    height: 128px;
+    background: #55dbaf;
+    background: linear-gradient(180deg, #55dbaf 55%, #55cbdb 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .header h1 {
+    font-size: 3rem;
+  }
+  .header p {
+    font-size: 1.5rem;
+  }
+  input {
+    background: #55dbaf;
+    border: none;
+    border-radius: 8px;
+  }
+  input:focus {
+    outline: none;
+  }
+  ::placeholder {
+    color: white;
+  }
+  @media screen and (max-width: 800px) {
+    .header {
+      height: 96px;
+    }
+    .header h1 {
+      font-size: 2rem;
+    }
+    .header p {
+      font-size: 1rem;
+    }
+    input {
+      border-radius: 6px;
+    }
   }
 
   /* main */
+  #total-blogs {
+    margin: 8px 0 0 8px;
+  }
+  #blogs-container {
+    padding: 8px;
+  }
+  .blog {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #49aebb;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .blog h2 {
+    font-size: 2rem;
+  }
+  .blog p {
+    font-size: 1.5rem;
+  }
+  @media screen and (max-width: 800px) {
+    .blog {
+      margin-bottom: 8px;
+      padding: 8px;
+    }
+    .blog h2 {
+      font-size: 1.5rem;
+    }
+    .blog p {
+      font-size: 1rem;
+    }
+  }
 
   /* admin */
+  #admin-pass-input {
+    position: fixed;
+    bottom: 4px;
+    left: 4px;
+    width: 80px;
+    height: 16px;
+    font-size: 1.5rem;
+    text-align: center;
+    opacity: 0.25;
+    transition: 0.25s;
+  }
+  #admin-pass-input:focus {
+    opacity: 1;
+    transition: 0.25s;
+  }
+
   #admin-blogs-edit {
+    width: 100vw;
+    height: 32px;
+    background: #55cbdb;
     display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  #admin-blogs-edit form {
+    width: 100%;
+    max-width: 1200px;
+    padding-left: 8px;
+  }
+  #admin-blogs-edit input {
+    font-size: 14px;
+    padding: 2px 6px;
+    width: calc(50% - 48px);
+    background: #49aebb;
+  }
+  #admin-blogs-edit input:focus {
+    background: #4991bb;
+  }
+  #admin-blogs-edit input[type="submit"] {
+    width: 80px;
+  }
+  #admin-blogs-edit input[type="submit"]:hover {
+    cursor: pointer;
+    background: #4991bb;
+    transition: 0.25s;
+  }
+  @media screen and (max-width: 800px) {
+    #admin-blogs-edit {
+      height: 64px;
+    }
+    #admin-blogs-edit form {
+      padding-left: 0px;
+    }
+    #admin-blogs-edit input {
+      margin: 0.5px 4px;
+      width: calc(100% - 8px);
+    }
+    #admin-blogs-edit input[type="submit"] {
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      margin: 2px 0 0 0;
+    }
+    
   }
 
   /* views */
+  #views {
+    position: fixed;
+    top: 0;
+    right: 4px;
+    font-size: 1.5rem;
+  }
+  @media screen and (max-width: 600px) {
+    #views {
+      font-size: 1rem;
+      height: 20px;
+    }
+  }
 
 </style>
 
 <body>
 
   <!-- html -->
-  <p id="views"></p>
+  <header class="header">
+    <h1 id="blog-name">My blogs</h1>
+    <p>by <a href="https://ma.cyou">Mapagmataas</a></p>
+  </header>
+  <p id="views" title="Total Views"></p>
 
   <div id="admin-blogs-edit">
     <form action="javascript:;" onsubmit="adminAddBlog(this, this.title.value, this.description.value)">
@@ -43,7 +199,12 @@
     </form>
   </div>
 
-  <input type="password" name="admin-password" id="admin-password-input">
+  <p id="total-blogs"></p>
+  <div id="blogs-container">
+    <p>Loading . . .</p>
+  </div>
+
+  <input type="password" name="admin-password" id="admin-pass-input">
 
 </body>
 </html>
@@ -73,38 +234,50 @@
 
   // main
   async function onLoadMain() {
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     console.log("Main Loaded");
   }
 
   // admin
   var ifAdmin = false;
   const adminBlogsEdit = document.getElementById("admin-blogs-edit");
-  const adminPasswordInput = document.getElementById("admin-password-input");
+  const adminPassInput = document.getElementById("admin-pass-input");
 
-  adminPasswordInput.oninput = () => {
-    let password = adminPasswordInput.value;
+  adminPassInput.oninput = () => {
+    let password = adminPassInput.value;
     if (password.length > 8) {
-      adminPasswordInput.value = password.slice(0, 8);
+      adminPassInput.value = password.slice(0, 8);
     }
     if (password === "admin") {
       ifAdmin = true;
-      showAdminBlogsEdit();
+      showAdmin();
     }
   }
 
-  function showAdminBlogsEdit() {
+  function showAdmin() {
+    adminPassInput.style.display = "none";
     adminBlogsEdit.style.display = "flex";
-    adminPasswordInput.style.display = "none";
   }
+
+  window.adminAddBlog = async (thisForm, title, description) => {
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  }
+
+  // for (let i = 0; i < 1000; i++) {
+  //   admin = true
+  //   let title = "Blog " + (Math.random() * 1000000000).toFixed(0);
+  //   let description = "This is a test blog";
+  //   await adminAddBlog(document.querySelector("form"), title, description);
+  // }
 
   // views
   async function onLoadViews() {
     let snap = await get(ref(db, "views"));
     if (!snap.exists()) {
       set(ref(db), {views: 1});
-      return;
+    } else {
+      update(ref(db), {views: snap.val() + 1});
     }
-    update(ref(db), {views: snap.val() + 1});
     document.getElementById("views").innerText = snap.val() + 1;
     console.log("Views Loaded");
   }
