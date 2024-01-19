@@ -260,7 +260,50 @@
   }
 
   window.adminAddBlog = async (thisForm, title, description) => {
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (!ifAdmin) {
+      alert("You are not an admin!");
+      return;
+    }
+    if (/[.#$\[\]]/.test(title)) {
+      alert('Title can not contain any of the folowing characters:\n".", "#", "$", "[", "]"');
+      return;
+    }
+    if (title.length < 3) {
+      alert("Title is too short,\nminimum lenght is 3 characters");
+      return;
+    }
+    if (title.length > 32) {
+      alert("Title is too long,\nmaximum lenght is 32 characters");
+      return;
+    }
+    if (description.length > 64) {
+      alert("Description is too long,\nmaximum lenght is 64 characters");
+      return;
+    }
+    let snap = await get(ref(db, "blogs/" + title.toLowerCase()));
+    if (snap.exists()) {
+      alert("Blog with this title already exists!");
+      return;
+    }
+    const blogData = {
+      title: title,
+      date: Date.now()
+    };
+    if (description.length > 0) {
+      if (description.lehgth < 6) {
+        alert("Description is too short,\nminimum lenght is 6 characters");
+        return;
+      }
+      blogData.description = description;
+    }
+    await set(ref(db, "blogs/" + title.toLowerCase()), blogData);
+    thisForm.querySelector("input[type='submit']").style.background = "#55dbaf";
+    thisForm.querySelectorAll("input[type='text']").forEach((thisInput) => {
+      thisInput.value = "";
+    });
+    setTimeout(() => {
+      thisForm.querySelector("input[type='submit']").style.background = "49aebb";
+    }, 1000);
   }
 
   // for (let i = 0; i < 1000; i++) {
