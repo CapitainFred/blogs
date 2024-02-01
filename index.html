@@ -354,12 +354,12 @@
       const hiddenClass = ifAdmin ? "" : " hidden";
 
       blogsContainer.innerHTML = `
-          <div class="blog">
-            <p class="blog-title" onclick="viewBlog()">${blog.title}</p>
-            ${blogDescription}
-            <div class="blog-delete${hiddenClass}" onclick="adminDelBlog('${blog.title.toLowerCase()}')">ⓧ</div>
-          </div>
-        `;
+        <div class="blog">
+          <p class="blog-title" onclick="viewBlog()">${blog.title}</p>
+          ${blogDescription}
+          <div class="blog-delete${hiddenClass}" onclick="adminDelBlog('${blog.title.toLowerCase()}')">ⓧ</div>
+        </div>
+      `;
     }
 
     window.searchBlogs = async (context) => {
@@ -388,13 +388,13 @@
           const hiddenClass = ifAdmin ? "" : " hidden";
 
           return `
-              <div class="blog">
-                <p class="blog-title" onclick="viewBlog('${blog.title.toLowerCase()}')">${blog.title}</p>
-                ${blogDescription}
-                <p class="blog-date">${formatDate(blog.date)}</p>
-                <div class="blog-delete${hiddenClass}" onclick="adminDelBlog('${blog.title.toLowerCase()}')">ⓧ</div>
-              </div>
-            `;
+            <div class="blog">
+              <p class="blog-title" onclick="viewBlog('${blog.title.toLowerCase()}')">${blog.title}</p>
+              ${blogDescription}
+              <p class="blog-date">${formatDate(blog.date)}</p>
+              <div class="blog-delete${hiddenClass}" onclick="adminDelBlog('${blog.title.toLowerCase()}')">ⓧ</div>
+            </div>
+          `;
         })
         .join("");
 
