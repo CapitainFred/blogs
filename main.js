@@ -39,17 +39,26 @@ async function loadMain() {
   }
   let blog = snap.val();
 
-  document.getElementById("blogs-count").innerHTML = formatDate(blog.date);
-  const blogDescription = blog.description ? `<p class="blog-description">${blog.description}</p>` : "";
+  document.getElementById("additional").innerHTML = `
+    <span class="material-symbols-outlined" style="cursor: pointer" onclick="viewBlog()">arrow_back</span>
+  `;
+  document.getElementById("title").innerHTML = blog.title;
+  if (blog.description) {
+    document.getElementById("description").innerHTML = `
+      ${blog.description}<br />
+      <p>${formatDate(blog.date)}</p>
+    `;
+  } else {
+    document.getElementById("description").innerHTML = formatDate(blog.date);
+  }
   const hiddenClass = ifAdmin ? "" : " hidden";
 
   blogsContainer.innerHTML = `
-        <div class="blog">
-          <p class="blog-title" onclick="viewBlog()">${blog.title}</p>
-          ${blogDescription}
-          <div class="blog-delete${hiddenClass}" onclick="adminDelBlog('${blog.title.toLowerCase()}')">ⓧ</div>
-        </div>
-      `;
+    <div class="blog">
+      <p class="blog-title" onclick="viewBlog()">${blog.title}</p>
+      <span class="material-symbols-outlined blog-delete${hiddenClass}" onclick="adminDelBlog('${blog.title.toLowerCase()}')">delete</span>
+    </div>
+  `;
 }
 
 window.searchBlogs = async (context) => {
@@ -75,24 +84,24 @@ window.searchBlogs = async (context) => {
   const blogsHTML = blogs
     .map((blog) => {
       const blogDescription = blog.description ? `<p class="blog-description">${blog.description}</p>` : "";
-      const hiddenClass = ifAdmin ? "" : " hidden";
+      const hiddenClass = ifAdmin ? "" : "hidden ";
 
       return `
-            <div class="blog">
-              <p class="blog-title" onclick="viewBlog('${blog.title.toLowerCase()}')">${blog.title}</p>
-              ${blogDescription}
-              <p class="blog-date">${formatDate(blog.date)}</p>
-              <div class="blog-delete${hiddenClass}" onclick="adminDelBlog('${blog.title.toLowerCase()}')">ⓧ</div>
-            </div>
-          `;
+        <div class="blog">
+          <p class="blog-title" onclick="viewBlog('${blog.title.toLowerCase()}')">${blog.title}</p>
+          ${blogDescription}
+          <p class="blog-date">${formatDate(blog.date)}</p>
+          <span class="${hiddenClass}blog-delete material-symbols-outlined" onclick="adminDelBlog('${blog.title.toLowerCase()}')">delete</span>
+        </div>
+      `;
     })
     .join("");
 
-  const blogsCount = document.getElementById("blogs-count");
+  const additional = document.getElementById("additional");
   if (!context || context == "") {
-    blogsCount.innerHTML = `Total blogs: ${blogs.length}`;
+    additional.innerHTML = `Total blogs: ${blogs.length}`;
   } else {
-    blogsCount.innerHTML = `Blogs found: ${blogs.length}`;
+    additional.innerHTML = `Blogs found: ${blogs.length}`;
   }
 
   blogsContainer.innerHTML = blogsHTML;
@@ -101,6 +110,8 @@ window.searchBlogs = async (context) => {
 window.viewBlog = (blogId) => {
   if (!blogId || blogId == "") {
     window.location.hash = "";
+    document.getElementById("title").innerHTML = "My blogs";
+    document.getElementById("description").innerHTML = "by <a href='https://ma.cyou'>Mapagmataas</a>";
     loadMain();
   } else {
     window.location.hash = blogId;
@@ -130,7 +141,7 @@ function showAdmin() {
 
   let elements = Array.from(document.getElementsByClassName("blog-delete"));
   elements.forEach((element) => {
-    element.classList.db.rem("hidden");
+    element.classList.remove("hidden");
   });
 }
 
@@ -203,4 +214,7 @@ async function loadViews() {
     db.upd(db.ref(db.link), { views: snap.val() + 1 });
   }
   document.getElementById("views").innerText = snap.val() + 1;
+  setInterval(async () => {
+    document.getElementById("views").innerText = (await db.get(db.ref(db.link, "views"))).val();
+  }, 5000);
 }
