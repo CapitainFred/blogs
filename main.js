@@ -13,8 +13,7 @@ function formatDate(date) {
 function showDialog(id) {
   let ifOpen = false;
   if (document.getElementById(id).open) ifOpen = true;
-  let elements = Array.from(document.querySelectorAll("dialog"));
-  elements.forEach((element) => {
+  document.querySelectorAll("dialog").forEach((element) => {
     element.close();
   });
   if (!ifOpen) {
@@ -56,8 +55,12 @@ async function loadMain() {
   }
   const styleCode = !ifAdmin
     ? ""
-    : ` <span id="blog-style-edit" class="blog" role="textbox" style="
+    : ` <span id="blog-style-edit" role="textbox" style="
       display: block;
+      margin-bottom: 8px;
+      padding: 8px 4px;
+      background: #00000025!important;
+      border-radius: 8px;
       overflow: hidden;
       resize: both;
       min-height: 40px;
@@ -66,8 +69,12 @@ async function loadMain() {
     " contenteditable>${blog.style}</span>`;
   const htmlCode = !ifAdmin
     ? ""
-    : `<span id="blog-html-edit" class="blog" role="textbox" style="
+    : `<span id="blog-html-edit" role="textbox" style="
       display: block;
+      margin-bottom: 8px;
+      padding: 8px 4px;
+      background: #00000025!important;
+      border-radius: 8px;
       overflow: hidden;
       resize: both;
       min-height: 40px;
@@ -86,6 +93,10 @@ async function loadMain() {
     <div id="blog-html" class="blog-body">${blog.html}</div>
     ${deleteBtn}
   `;
+
+  document.querySelectorAll(".code").forEach((el) => {
+    hljs.highlightElement(el);
+  });
 }
 
 document.getElementById("search-btn").onclick = () => {
