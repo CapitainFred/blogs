@@ -10,18 +10,21 @@ function formatDate(date) {
   return new Date(date).toLocaleDateString(undefined, options);
 }
 
+function showDialog(id) {
+  let ifOpen = false;
+  if (document.getElementById(id).open) ifOpen = true;
+  let elements = Array.from(document.querySelectorAll("dialog"));
+  elements.forEach((element) => {
+    element.close();
+  });
+  if (!ifOpen) {
+    document.getElementById(id).open = true;
+  }
+}
+
 window.onload = async () => {
   loadMain();
   loadViews();
-
-  // for (let i = 0; i < 100; i++) {
-  //   ifAdmin = true
-  //   let title = "Blog " + i;
-  //   let description = "";
-  //   if (Math.random() > 0.5) description = "This is a test blog this is a test blog this is a test blog";
-  //   adminAddBlog(document.querySelector("form"), title, description);
-  //   await new Promise(resolve => setTimeout(resolve, Math.round(Math.random() * 10) * 1000));
-  // }
 };
 
 // main
@@ -51,15 +54,43 @@ async function loadMain() {
   } else {
     document.getElementById("description").innerHTML = formatDate(blog.date);
   }
-  const hiddenClass = ifAdmin ? "" : " hidden";
+  const styleCode = !ifAdmin
+    ? ""
+    : ` <span id="blog-style-edit" class="blog" role="textbox" style="
+      display: block;
+      overflow: hidden;
+      resize: both;
+      min-height: 40px;
+      line-height: 20px;
+      white-space: pre-wrap;
+    " contenteditable>${blog.style}</span>`;
+  const htmlCode = !ifAdmin
+    ? ""
+    : `<span id="blog-html-edit" class="blog" role="textbox" style="
+      display: block;
+      overflow: hidden;
+      resize: both;
+      min-height: 40px;
+      line-height: 20px;
+      white-space: pre-wrap;
+    " contenteditable>${blog.html.replace(/</g, "&lt;").replace(/</g, "&gt;")}</span>`;
+  const deleteBtn = !ifAdmin
+    ? ""
+    : `<span class="blog-delete material-symbols-outlined"
+    onclick="adminDelBlog('${blog.title.toLowerCase()}')">delete</span>`;
 
   blogsContainer.innerHTML = `
-    <div class="blog">
-      <p class="blog-title" onclick="viewBlog()">${blog.title}</p>
-      <span class="material-symbols-outlined blog-delete${hiddenClass}" onclick="adminDelBlog('${blog.title.toLowerCase()}')">delete</span>
-    </div>
+    <style id="blog-style">${blog.style}</style>
+    ${styleCode}
+    ${htmlCode}
+    <div id="blog-html" class="blog-body">${blog.html}</div>
+    ${deleteBtn}
   `;
 }
+
+document.getElementById("search-btn").onclick = () => {
+  showDialog("search-blogs");
+};
 
 window.searchBlogs = async (context) => {
   const blogsContainer = document.getElementById("blogs-container");
@@ -91,7 +122,8 @@ window.searchBlogs = async (context) => {
           <p class="blog-title" onclick="viewBlog('${blog.title.toLowerCase()}')">${blog.title}</p>
           ${blogDescription}
           <p class="blog-date">${formatDate(blog.date)}</p>
-          <span class="${hiddenClass}blog-delete material-symbols-outlined" onclick="adminDelBlog('${blog.title.toLowerCase()}')">delete</span>
+          <span class="${hiddenClass}blog-delete material-symbols-outlined"
+          onclick="adminDelBlog('${blog.title.toLowerCase()}')">delete</span>
         </div>
       `;
     })
@@ -121,29 +153,22 @@ window.viewBlog = (blogId) => {
 
 // admin
 var ifAdmin = false;
-const adminBlogsEdit = document.getElementById("admin-blogs-edit");
-const adminPassInput = document.getElementById("admin-pass-input");
+const adminBlogsAdd = document.getElementById("admin-blogs-add");
 
-adminPassInput.oninput = () => {
-  let password = adminPassInput.value;
-  if (password.length > 8) {
-    adminPassInput.value = password.slice(0, 8);
+document.getElementById("admin-btn").onclick = () => {
+  if (!ifAdmin) {
+    var password = prompt("Enter Password:", "password");
+    if (password === "admin") {
+      ifAdmin = true;
+    } else {
+      alert("Wrong password!");
+      return;
+    }
   }
-  if (password === "admin") {
-    ifAdmin = true;
-    showAdmin();
-  }
-};
-
-function showAdmin() {
-  adminPassInput.style.display = "none";
-  adminBlogsEdit.style.display = "flex";
-
+  showDialog("admin-blogs-add");
   let elements = Array.from(document.getElementsByClassName("blog-delete"));
-  elements.forEach((element) => {
-    element.classList.remove("hidden");
-  });
-}
+  loadMain();
+};
 
 window.adminAddBlog = async (thisForm, title, description) => {
   if (!ifAdmin) {
@@ -174,6 +199,13 @@ window.adminAddBlog = async (thisForm, title, description) => {
   const blogData = {
     title: title,
     date: Date.now(),
+    html: `<h1>${title}</h1>`,
+    style: `.blog-body {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #00000025;
+  border-radius: 8px;
+}`,
   };
   if (description.length > 0) {
     blogData.description = description;
@@ -201,7 +233,7 @@ window.adminDelBlog = async (blogId) => {
   }
   if (window.confirm(`Do you realy want to remove ${blogId}?`)) {
     await db.rem(db.ref(db.link, "blogs/" + blogId));
-    searchBlogs();
+    viewBlog();
   }
 };
 

@@ -44,18 +44,54 @@ body {
   font-size: 1.25rem;
 }
 
+::placeholder {
+  color: #ffffffd5;
+  opacity: 1;
+}
+
+dialog {
+  position: fixed;
+  top: 24px;
+  left: auto;
+  border: 0;
+  padding: 8px;
+  height: auto;
+  border-radius: 8px;
+  background: #00000025;
+  color: #ffffffff;
+  text-align: center;
+}
+
 input {
-  background: #55dbaf;
+  font-size: 1rem;
+  padding: 2px 6px;
+  margin: 2px 0;
+  background: #00000025;
+  color: #ffffffd5;
   border: none;
   border-radius: 8px;
 }
 
 input:focus {
+  background: #00000050;
   outline: none;
 }
 
-::placeholder {
-  color: white;
+input[type="submit"]:hover {
+  cursor: pointer;
+  background: #00000050;
+  transition: 0.25s;
+}
+
+@media screen and (max-width: 800px) {
+  dialog {
+    padding: 6px;
+  }
+  input {
+    font-size: 0.75rem;
+    padding: 1.5px 4px;
+    margin: 1.5px 0;
+  }
 }
 
 .hidden {
@@ -69,7 +105,7 @@ input:focus {
 
   #title {
     font-size: 2.5rem;
-    text-shadow: #49aebb 1px 1px 2px;
+    text-shadow: #00000025 1px 1px 2px;
     margin-bottom: -4px;
   }
 
@@ -87,6 +123,13 @@ input:focus {
 }
 
 /* main */
+#search-btn {
+  position: fixed;
+  top: 0;
+  right: 2px;
+  cursor: pointer;
+}
+
 #additional {
   color: #85e5c5;
   margin: 8px 0 0 8px;
@@ -99,7 +142,7 @@ input:focus {
 .blog {
   margin-bottom: 16px;
   padding: 12px;
-  background: #49aebb;
+  background: #00000025;
   border-radius: 8px;
 }
 
@@ -155,94 +198,25 @@ input:focus {
 }
 
 /* admin */
-#admin-pass-input {
+#admin-btn {
   position: fixed;
-  bottom: 4px;
-  left: 4px;
-  width: 80px;
-  height: 16px;
-  font-size: 1.5rem;
-  text-align: center;
-  opacity: 0.25;
-  transition: 0.25s;
-}
-
-#admin-pass-input:focus {
-  opacity: 1;
-  transition: 0.25s;
-}
-
-#admin-blogs-edit {
-  width: 100vw;
-  height: 32px;
-  background: #55cbdb;
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-#admin-blogs-edit form {
-  width: 100%;
-  max-width: 1200px;
-  padding-left: 8px;
-}
-
-#admin-blogs-edit input {
-  font-size: 14px;
-  padding: 2px 6px;
-  width: calc(50% - 48px);
-  background: #49aebb;
-}
-
-#admin-blogs-edit input:focus {
-  background: #4991bb;
-}
-
-#admin-blogs-edit input[type="submit"] {
-  width: 80px;
-}
-
-#admin-blogs-edit input[type="submit"]:hover {
+  top: 0;
+  right: 28px;
   cursor: pointer;
-  background: #4991bb;
-  transition: 0.25s;
-}
-
-@media screen and (max-width: 800px) {
-  #admin-blogs-edit {
-    height: 64px;
-  }
-
-  #admin-blogs-edit form {
-    padding-left: 0px;
-  }
-
-  #admin-blogs-edit input {
-    margin: 0.5px 4px;
-    width: calc(100% - 8px);
-  }
-
-  #admin-blogs-edit input[type="submit"] {
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    margin: 2px 0 0 0;
-  }
 }
 
 /* views */
 #views {
   position: fixed;
-  top: 0;
-  right: 4px;
-  font-size: 1.5rem;
+  top: 2px;
+  right: 54px;
+  font-size: 1.25rem;
+  cursor: help;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
   #views {
     font-size: 1rem;
-    height: 20px;
+    top: 4px;
   }
 }
