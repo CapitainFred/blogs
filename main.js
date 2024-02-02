@@ -28,7 +28,12 @@ window.onload = async () => {
 
 // main
 async function loadMain() {
+  const title = document.getElementById("title");
+  const description = document.getElementById("description");
   if (!location.hash) {
+    title.innerHTML = "My blogs";
+    description.innerHTML = "by <a href='https://ma.cyou'>Mapagmataas</a>";
+    window.title = "My blogs";
     await searchBlogs();
     return;
   }
@@ -36,7 +41,7 @@ async function loadMain() {
   const blogName = decodeURIComponent(location.hash).substring(1);
   let snap = await db.get(db.ref(db.link, "blogs/" + blogName));
   if (!snap.exists()) {
-    blogsContainer.innerHTML = `<p>No blog with name ${blogName} not found</p>`;
+    blogsContainer.innerHTML = `<p>No blog with name ${blogName} found</p>`;
     return;
   }
   let blog = snap.val();
@@ -44,43 +49,21 @@ async function loadMain() {
   document.getElementById("additional").innerHTML = `
     <span class="material-symbols-outlined" style="cursor: pointer" onclick="viewBlog()">arrow_back</span>
   `;
-  document.getElementById("title").innerHTML = blog.title;
-  if (blog.description) {
-    document.getElementById("description").innerHTML = `
+  title.innerHTML = blog.title;
+  document.getElementById("description").innerHTML = blog.description
+    ? `
       ${blog.description}<br />
       <p>${formatDate(blog.date)}</p>
-    `;
-  } else {
-    document.getElementById("description").innerHTML = formatDate(blog.date);
-  }
+    `
+    : formatDate(blog.date);
   const styleCode = !ifAdmin
     ? ""
-    : ` <span id="blog-style-edit" role="textbox" style="
-      display: block;
-      margin-bottom: 8px;
-      padding: 8px 4px;
-      background: #00000025!important;
-      border-radius: 8px;
-      overflow: hidden;
-      resize: both;
-      min-height: 40px;
-      line-height: 20px;
-      white-space: pre-wrap;
-    " contenteditable>${blog.style}</span>`;
+    : ` <span id="blog-style-edit" class="code" role="textbox" contenteditable>${blog.style}</span>`;
   const htmlCode = !ifAdmin
     ? ""
-    : `<span id="blog-html-edit" role="textbox" style="
-      display: block;
-      margin-bottom: 8px;
-      padding: 8px 4px;
-      background: #00000025!important;
-      border-radius: 8px;
-      overflow: hidden;
-      resize: both;
-      min-height: 40px;
-      line-height: 20px;
-      white-space: pre-wrap;
-    " contenteditable>${blog.html.replace(/</g, "&lt;").replace(/</g, "&gt;")}</span>`;
+    : `<span id="blog-html-edit" class="code" role="textbox" contenteditable>${blog.html
+        .replace(/</g, "&lt;")
+        .replace(/</g, "&gt;")}</span>`;
   const deleteBtn = !ifAdmin
     ? ""
     : `<span class="blog-delete material-symbols-outlined"
@@ -93,10 +76,6 @@ async function loadMain() {
     <div id="blog-html" class="blog-body">${blog.html}</div>
     ${deleteBtn}
   `;
-
-  document.querySelectorAll("#blog-style-edit, #blog-html-edit").forEach((el) => {
-    hljs.highlightElement(el);
-  });
 }
 
 document.getElementById("search-btn").onclick = () => {
@@ -153,8 +132,6 @@ window.searchBlogs = async (context) => {
 window.viewBlog = (blogId) => {
   if (!blogId || blogId == "") {
     window.location.hash = "";
-    document.getElementById("title").innerHTML = "My blogs";
-    document.getElementById("description").innerHTML = "by <a href='https://ma.cyou'>Mapagmataas</a>";
     loadMain();
   } else {
     window.location.hash = blogId;
@@ -176,8 +153,7 @@ document.getElementById("admin-btn").onclick = () => {
       return;
     }
   }
-  showDialog("admin-blogs-add");
-  let elements = Array.from(document.getElementsByClassName("blog-delete"));
+  if (!location.hash) showDialog("admin-blogs-add");
   loadMain();
 };
 
@@ -229,7 +205,7 @@ window.adminAddBlog = async (thisForm, title, description) => {
   setTimeout(() => {
     thisForm.querySelector("input[type='submit']").style.background = "#49aebb";
   }, 1000);
-  searchBlogs();
+  loadMain();
 };
 
 window.adminDelBlog = async (blogId) => {

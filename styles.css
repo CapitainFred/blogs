@@ -94,6 +94,19 @@ input[type="submit"]:hover {
   }
 }
 
+.code {
+  display: block;
+  margin-bottom: 8px;
+  padding: 8px 4px;
+  background: #00000025 !important;
+  border-radius: 8px;
+  overflow: hidden;
+  resize: both;
+  min-height: 40px;
+  line-height: 20px;
+  white-space: pre-wrap;
+}
+
 .hidden {
   display: none!important;
 }
