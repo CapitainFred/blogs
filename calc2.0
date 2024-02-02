@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kyslotta</title>
+    <link rel="stylesheet" type="text/css" href="src/css/index.css">
+</head>
+<body>
+ <div class="top-nav">
+    <div class="cur">
+        <a href="calc2.0.html">calc2.0</a>
+    </div>
+    <div>
+        <a href="index.html">index</a>
+    </div>
+    <div>
+        <a href="2.html">2</a>
+    </div>
+    <div> 
+        <a href="author.html">author</a>
+    </div>
+    <div> 
+        <a href="calc.html">calc</a>
+    </div>
+ </div>
+ <div class="title-cont">
+    <p>калькулятор 2.0</p>
+    <input id="num1">
+    <input id="num2">
+    <select id="operator">
+        <option value="add">+</option>
+        <option value="subtract">-</option>
+        <option value="multiply">*</option>
+        <option value="divide">:</option>
+    </select>
+    <button onclick="func()">Посчитать</button>
+    <p id="result"></p>
+<script>
+function func() {
+   
+   let result;
+   const num1 = parseFloat(document.getElementById("num1").value);
+   const num2 = parseFloat(document.getElementById("num2").value);
+   const operator =   document.getElementById("operator").value;
+   switch (operator) {
+     case 'add':
+        console.log(num1,num2)
+       result = num1 + num2;
+       break;
+     case 'subtract':
+       result = num1 - num2;
+       break;
+     case 'multiply':
+       result = num1 * num2;
+       break;
+     case 'divide':
+       result = num1 / num2;
+       break;
+   }
+ 
+ 
+   document.getElementById("result").innerHTML = result;
+ } 
+</script>
+</body>
+</html>
