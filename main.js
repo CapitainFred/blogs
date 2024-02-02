@@ -28,61 +28,22 @@ window.onload = async () => {
 
 // main
 async function loadMain() {
-  const title = document.getElementById("title");
-  const description = document.getElementById("description");
   if (!location.hash) {
-    title.innerHTML = "My blogs";
-    description.innerHTML = "by <a href='https://ma.cyou'>Mapagmataas</a>";
-    window.title = "My blogs";
-    await searchBlogs();
-    return;
+    searchBlogs();
+  } else {
+    loadBlog(decodeURIComponent(location.hash).substring(1));
   }
-  const blogsContainer = document.getElementById("blogs-container");
-  const blogName = decodeURIComponent(location.hash).substring(1);
-  let snap = await db.get(db.ref(db.link, "blogs/" + blogName));
-  if (!snap.exists()) {
-    blogsContainer.innerHTML = `<p>No blog with name ${blogName} found</p>`;
-    return;
-  }
-  let blog = snap.val();
-
-  document.getElementById("additional").innerHTML = `
-    <span class="material-symbols-outlined" style="cursor: pointer" onclick="viewBlog()">arrow_back</span>
-  `;
-  title.innerHTML = blog.title;
-  document.getElementById("description").innerHTML = blog.description
-    ? `
-      ${blog.description}<br />
-      <p>${formatDate(blog.date)}</p>
-    `
-    : formatDate(blog.date);
-  const styleCode = !ifAdmin
-    ? ""
-    : ` <span id="blog-style-edit" class="code" role="textbox" contenteditable>${blog.style}</span>`;
-  const htmlCode = !ifAdmin
-    ? ""
-    : `<span id="blog-html-edit" class="code" role="textbox" contenteditable>${blog.html
-        .replace(/</g, "&lt;")
-        .replace(/</g, "&gt;")}</span>`;
-  const deleteBtn = !ifAdmin
-    ? ""
-    : `<span class="blog-delete material-symbols-outlined"
-    onclick="adminDelBlog('${blog.title.toLowerCase()}')">delete</span>`;
-
-  blogsContainer.innerHTML = `
-    <style id="blog-style">${blog.style}</style>
-    ${styleCode}
-    ${htmlCode}
-    <div id="blog-html" class="blog-body">${blog.html}</div>
-    ${deleteBtn}
-  `;
 }
 
-document.getElementById("search-btn").onclick = () => {
-  showDialog("search-blogs");
-};
-
 window.searchBlogs = async (context) => {
+  const searchBtn = document.getElementById("search-btn");
+  searchBtn.onclick = () => {
+    showDialog("search-blogs");
+  };
+  searchBtn.innerHTML = "search";
+  document.getElementById("title").innerHTML = "My blogs";
+  document.getElementById("description").innerHTML = "by <a href='https://ma.cyou'>Mapagmataas</a>";
+  document.title = "My blogs";
   const blogsContainer = document.getElementById("blogs-container");
   let snap = await db.get(db.ref(db.link, "blogs"));
   if (!snap.exists()) {
@@ -127,6 +88,56 @@ window.searchBlogs = async (context) => {
   }
 
   blogsContainer.innerHTML = blogsHTML;
+};
+
+async function loadBlog(blogId) {
+  const blogsContainer = document.getElementById("blogs-container");
+  let snap = await db.get(db.ref(db.link, "blogs/" + blogId));
+  if (!snap.exists()) {
+    blogsContainer.innerHTML = `<p>No blog with name ${blogId} found</p>`;
+    return;
+  }
+  let blog = snap.val();
+  const searchBtn = document.getElementById("search-btn");
+  searchBtn.onclick = () => {
+    adminDelBlog(blogId);
+  };
+  searchBtn.innerHTML = "delete";
+  document.getElementById("additional").innerHTML = `
+    <span class="material-symbols-outlined" style="cursor: pointer" onclick="viewBlog()">arrow_back</span>
+  `;
+  document.getElementById("title").innerHTML = blog.title;
+  document.getElementById("description").innerHTML = blog.description
+    ? `
+      ${blog.description}<br />
+      <p>${formatDate(blog.date)}</p>
+    `
+    : formatDate(blog.date);
+  document.title = blog.title;
+  const styleCode = !ifAdmin
+    ? ""
+    : ` <span id="blog-style-edit" class="code" role="textbox" contenteditable
+      oninput="updateBlog('${blogId}', 'style', this.innerText)">${blog.style}</span>`;
+  const htmlCode = !ifAdmin
+    ? ""
+    : `<span id="blog-html-edit" class="code" role="textbox" contenteditable
+      oninput="updateBlog('${blogId}', 'html', this.innerText)">${blog.html
+        .replace(/</g, "&lt;")
+        .replace(/</g, "&gt;")}</span>`;
+
+  blogsContainer.innerHTML = `
+    <style id="blog-style">${blog.style}</style>
+    ${styleCode}
+    ${htmlCode}
+    <div id="blog-html" class="blog-body">${blog.html}</div>
+  `;
+}
+
+window.updateBlog = (blogId, type, value) => {
+  document.getElementById("blog-" + type).innerHTML = value;
+  db.upd(db.ref(db.link, "blogs/" + blogId), {
+    [type]: value,
+  });
 };
 
 window.viewBlog = (blogId) => {
@@ -233,7 +244,4 @@ async function loadViews() {
     db.upd(db.ref(db.link), { views: snap.val() + 1 });
   }
   document.getElementById("views").innerText = snap.val() + 1;
-  setInterval(async () => {
-    document.getElementById("views").innerText = (await db.get(db.ref(db.link, "views"))).val();
-  }, 5000);
 }

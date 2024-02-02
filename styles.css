@@ -146,6 +146,7 @@ input[type="submit"]:hover {
 #additional {
   color: #85e5c5;
   margin: 8px 0 0 8px;
+  text-decoration:solid;
 }
 
 #blogs-container {
@@ -180,7 +181,7 @@ input[type="submit"]:hover {
 .blog-delete {
   color: #dd622e;
   font-size: 1rem;
-  margin: 0 0 0 calc(50% - 1rem);
+  margin: 16px 0 -16px 4px;
   cursor: pointer;
 }
 
@@ -205,8 +206,8 @@ input[type="submit"]:hover {
   }
 
   .blog-delete {
-    font-size: 0.75rem;
-    margin: -25px 0 -10px;
+    font-size: 0.5rem;
+    margin: 12px 0 -16px 2px;
   }
 }
 
