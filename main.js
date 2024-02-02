@@ -94,7 +94,7 @@ async function loadMain() {
     ${deleteBtn}
   `;
 
-  document.querySelectorAll(".code").forEach((el) => {
+  document.querySelectorAll("#blog-style-edit, #blog-html-edit").forEach((el) => {
     hljs.highlightElement(el);
   });
 }
