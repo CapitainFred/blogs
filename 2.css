@@ -1,0 +1,18 @@
+.top-nav{
+    display: flex;
+    }
+    .top-nav div{
+        margin: 4px 8px;
+        font-size: 32px;
+    }
+    .top-nav a{
+    text-decoration: underline;
+    color: black;
+    }
+    .top-nav a:hover{
+        color:aliceblue;
+    }
+    .cur a{
+        font-size: 36px;
+        color: aqua
+    }
